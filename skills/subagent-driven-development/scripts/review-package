@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# review-package PLAN_FILE BASE_SHA HEAD_SHA — bundle commit list, file stats,
+# and full diff for a SHA range into one markdown file under the plan's SDD
+# workspace. Prints the package path as the last line of stdout.
+set -euo pipefail
+
+usage() {
+  echo "usage: review-package PLAN_FILE BASE_SHA HEAD_SHA" >&2
+  exit 1
+}
+
+[ $# -eq 3 ] || usage
+plan=$1
+base_sha=$2
+head_sha=$3
+[ -f "$plan" ] || { echo "review-package: PLAN_FILE '$plan' is not an existing file" >&2; usage; }
+
+if ! root=$(git rev-parse --show-toplevel 2>/dev/null); then
+  echo "review-package: not inside a git repository" >&2
+  exit 2
+fi
+
+git -C "$root" rev-parse --verify --quiet "$base_sha^{commit}" >/dev/null \
+  || { echo "review-package: BASE_SHA '$base_sha' does not resolve to a commit" >&2; exit 1; }
+git -C "$root" rev-parse --verify --quiet "$head_sha^{commit}" >/dev/null \
+  || { echo "review-package: HEAD_SHA '$head_sha' does not resolve to a commit" >&2; exit 1; }
+
+base7=$(git -C "$root" rev-parse --short=7 "$base_sha")
+head7=$(git -C "$root" rev-parse --short=7 "$head_sha")
+
+plan_base=$(basename -- "$plan")
+plan_base=${plan_base%.*}
+outdir="$root/.smartpowers/sdd/$plan_base"
+out="$outdir/review-$base7-$head7.md"
+mkdir -p "$outdir"
+
+{
+  printf '# Review package\n\n'
+  printf 'Range: `%s..%s` (%s..%s)\n\n' "$base7" "$head7" "$base_sha" "$head_sha"
+  printf '## Commits\n\n'
+  git -C "$root" log --oneline "$base_sha..$head_sha"
+  printf '\n## Files changed\n\n'
+  git -C "$root" diff --stat "$base_sha" "$head_sha"
+  printf '\n## Diff\n\n```diff\n'
+  git -C "$root" diff "$base_sha" "$head_sha"
+  printf '```\n'
+} > "$out"
+
+printf '%s\n' "$out"
