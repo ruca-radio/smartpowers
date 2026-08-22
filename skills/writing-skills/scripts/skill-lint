@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+"""skill-lint [skills-dir] — lint SmartPowers skills against writing-skills rules.
+
+Checks every <skills-dir>/<name>/SKILL.md. Prints a per-skill table, detailed
+findings, and a summary. Exit 0 when no errors, 1 on lint errors or usage
+mistakes, 2 on runtime failure.
+"""
+import os
+import re
+import sys
+
+DESC_MAX = 500
+DEFAULT_WORD_LIMIT = 800
+BOOTSTRAP_WORD_LIMIT = 250
+BOOTSTRAP_SKILL = "using-smartpowers"
+
+NAME_RE = re.compile(r"^[a-z0-9-]+$")
+AT_RE = re.compile(r"@[a-z][a-z0-9-]+")
+BACKTICK_RE = re.compile(r"`([^`\n]+)`")
+UPPER_RE = re.compile(r"[A-Z]")
+LOWER_RE = re.compile(r"[a-z]")
+PLACEHOLDER_RE = re.compile(r"[<>*]|[A-Z]")
+TRAILING_PUNCT = ".,;:)\"'"
+
+
+def parse_frontmatter(text):
+    """Return (frontmatter dict, body, error)."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None, text, "missing YAML frontmatter (file must start with a '---' line)"
+    end = None
+    for i in range(1, len(lines)):
+        if lines[i].strip() == "---":
+            end = i
+            break
+    if end is None:
+        return None, text, "unterminated YAML frontmatter (no closing '---' line)"
+    fm = {}
+    for line in lines[1:end]:
+        m = re.match(r"^([A-Za-z_-]+):\s*(.*)$", line)
+        if m:
+            fm[m.group(1)] = m.group(2).strip().strip('"').strip("'")
+    body = "\n".join(lines[end + 1:])
+    if "name" not in fm or not fm["name"]:
+        return fm, body, "frontmatter missing 'name:'"
+    if "description" not in fm or not fm["description"]:
+        return fm, body, "frontmatter missing 'description:'"
+    return fm, body, None
+
+
+def local_file_refs(body):
+    """Backticked tokens that name local files: scripts/..., references/...,
+    or bare *.md filenames. Placeholders (with <, >, *, or uppercase letters,
+    e.g. task-N-brief.md, CLAUDE.md) are templates, not local paths."""
+    refs = []
+    for span in BACKTICK_RE.findall(body):
+        for token in span.split():
+            token = token.strip(TRAILING_PUNCT)
+            if not token:
+                continue
+            is_local = (
+                token.startswith("scripts/")
+                or token.startswith("references/")
+                or ("/" not in token and token.endswith(".md"))
+            )
+            if is_local and not PLACEHOLDER_RE.search(token):
+                refs.append(token)
+    return refs
+
+
+def caps_runs(body):
+    """Return count of ALL-CAPS prose blocks (3+ consecutive fully-uppercase
+    lines). Fenced code is ignored."""
+    runs = 0
+    streak = 0
+    in_fence = False
+    for line in body.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            streak = 0
+            continue
+        if in_fence:
+            continue
+        if stripped and UPPER_RE.search(stripped) and not LOWER_RE.search(stripped):
+            streak += 1
+            if streak == 3:
+                runs += 1
+        else:
+            streak = 0
+    return runs
+
+
+def lint_skill(skills_dir, name):
+    """Return (word_count, errors, warnings) for one skill directory."""
+    errors = []
+    warnings = []
+    skill_dir = os.path.join(skills_dir, name)
+    skill_md = os.path.join(skill_dir, "SKILL.md")
+
+    if not os.path.isfile(skill_md):
+        return 0, ["missing SKILL.md"], []
+
+    with open(skill_md, encoding="utf-8") as f:
+        text = f.read()
+
+    fm, body, fm_error = parse_frontmatter(text)
+    if fm_error:
+        errors.append(fm_error)
+        fm = {}
+
+    skill_name = fm.get("name", "")
+    desc = fm.get("description", "")
+
+    if skill_name:
+        if skill_name != name:
+            errors.append("frontmatter name '%s' does not match directory name '%s'" % (skill_name, name))
+        if not NAME_RE.match(skill_name):
+            errors.append("name '%s' must use only lowercase letters, numbers, hyphens" % skill_name)
+    if desc:
+        if len(desc) > DESC_MAX:
+            errors.append("description is %d characters (max %d)" % (len(desc), DESC_MAX))
+        if not desc.startswith("Use "):
+            warnings.append("description does not start with 'Use ' (want trigger-style)")
+
+    for ref in local_file_refs(body):
+        if not os.path.exists(os.path.join(skill_dir, ref)):
+            errors.append("broken file reference: '%s' not found relative to %s/" % (ref, name))
+
+    words = len(body.split())
+    limit = BOOTSTRAP_WORD_LIMIT if name == BOOTSTRAP_SKILL else DEFAULT_WORD_LIMIT
+    if words > limit:
+        warnings.append("word count %d exceeds limit %d" % (words, limit))
+
+    if re.search(r"^```(dot|graphviz)\b", body, re.MULTILINE) or re.search(r"\bdigraph\b", body):
+        warnings.append("contains Graphviz content (use text-based diagrams)")
+    if "<SUBAGENT-STOP>" in body:
+        warnings.append("contains <SUBAGENT-STOP> block")
+    if AT_RE.search(body):
+        warnings.append("contains @skill force-load reference (cross-reference by plain name)")
+    n_caps = caps_runs(body)
+    if n_caps:
+        warnings.append("contains %d ALL-CAPS prose block(s) (3+ consecutive uppercase lines)" % n_caps)
+
+    return words, errors, warnings
+
+
+def main(argv):
+    if len(argv) > 2:
+        print("usage: skill-lint [skills-dir]", file=sys.stderr)
+        return 1
+    skills_dir = argv[1] if len(argv) == 2 else "skills"
+    if not os.path.isdir(skills_dir):
+        print("skill-lint: skills directory '%s' not found" % skills_dir, file=sys.stderr)
+        return 2
+
+    names = sorted(d for d in os.listdir(skills_dir) if os.path.isdir(os.path.join(skills_dir, d)))
+    if not names:
+        print("skill-lint: no skill directories under '%s'" % skills_dir, file=sys.stderr)
+        return 2
+
+    results = []
+    for name in names:
+        words, errors, warnings = lint_skill(skills_dir, name)
+        results.append((name, words, errors, warnings))
+
+    name_w = max(len(n) for n, _, _, _ in results)
+    print("%-*s  %5s  %6s  %8s" % (name_w, "skill", "words", "errors", "warnings"))
+    print("%-*s  %5s  %6s  %8s" % (name_w, "-" * name_w, "-----", "------", "--------"))
+    for name, words, errors, warnings in results:
+        print("%-*s  %5d  %6d  %8d" % (name_w, name, words, len(errors), len(warnings)))
+
+    findings = [(n, kind, msg)
+                for n, _, errs, warns in results
+                for kind, msgs in (("ERROR", errs), ("WARNING", warns))
+                for msg in msgs]
+    if findings:
+        print()
+        print("findings:")
+        for name, kind, msg in findings:
+            print("  %s: %s: %s" % (name, kind, msg))
+
+    total_errors = sum(len(e) for _, _, e, _ in results)
+    total_warnings = sum(len(w) for _, _, _, w in results)
+    print()
+    print("summary: %d skills, %d errors, %d warnings" % (len(results), total_errors, total_warnings))
+    return 1 if total_errors else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
