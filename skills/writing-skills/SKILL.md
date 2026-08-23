@@ -73,6 +73,7 @@ Use words agents search for: error messages, symptoms ("flaky", "hanging"), syno
 - Bootstrap skills: <250 words
 - Frequently-loaded: <400 words total
 - Other skills: <800 words
+- Keep high-churn skills ~5% under target — a field fix should land without a compression pass
 
 **Techniques:**
 - Move details to tool help (`--help`) instead of inline docs
