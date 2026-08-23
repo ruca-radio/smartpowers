@@ -43,6 +43,7 @@ Model per role: the least capable model that handles the task class (see the mod
 - Dispatch a full wave simultaneously; record agent identities.
 - **Stage gates:** validate a stage's merged outputs before dispatching the next stage. Parallel agents cannot see each other — route all shared context yourself.
 - While agents run, do your own non-overlapping work (ledger, next briefs, review packaging). Never idle-poll.
+- **Turn discipline:** never end the turn with agents in flight — an ended turn does not resume in most harnesses. Block on the harness wait primitive in bounded stretches until the wave completes. Status notes go between waits, never instead of them.
 - Merge per `smartpowers:dispatching-parallel-agents`; run integrated verification on the merged result.
 
 ## Failure Handling
@@ -62,3 +63,4 @@ Model per role: the least capable model that handles the task class (see the mod
 | "They'll figure out the shared context" | Parallel agents see nothing of each other. Route it or it doesn't exist. |
 | "This dependency is minor" | A minor dependency is still a dependency. Stage it. |
 | "I'll review everything at the end" | End-of-swarm review finds structural problems after N agents have amplified them. Gate each stage. |
+| "Completions arrive automatically" | In most harnesses an ended turn never resumes. Block on the wait primitive; don't hand back. |

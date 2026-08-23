@@ -24,6 +24,7 @@ Ask the implementing agent pointed questions and make it defend its decisions:
 - "What happens when this runs concurrently / with empty input / at 10x scale?"
 - "Where does this couple to code outside your task? Why is that acceptable?"
 - "If this fails at 3 AM, what does the operator see?"
+- "What does the controller do while your agents run? What wakes it?"
 
 A weak or missing answer is itself a finding. An agent that cannot explain a decision did not make one — it guessed.
 

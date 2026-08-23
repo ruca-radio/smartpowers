@@ -32,6 +32,10 @@ Run independent tasks concurrently to reduce wall-clock time. Coordinate results
 5. **Merge** — combine outputs. Resolve conflicts if any (shouldn't happen if decomposition was correct).
 6. **Verify** — run integrated tests on merged result.
 
+## Turn Discipline
+
+**Never end the turn with agents in flight.** An ended turn does not resume in most harnesses — "they'll report back" means the session sits idle forever. Block on your harness's wait primitive (wait-for-message, task-output) in bounded stretches; on each wake, reconcile completed agents and continue. Post status notes between waits, never instead of them. Sole exception: your human partner explicitly asks for detached background operation.
+
 ## Failure Handling
 
 | Scenario | Action |
@@ -54,3 +58,4 @@ Run independent tasks concurrently to reduce wall-clock time. Coordinate results
 | "These are mostly independent" | "Mostly" means they're not. Sequentialize until truly independent. |
 | "Parallel is always faster" | Coordination overhead, merge conflicts, and debugging complexity often erase gains for <3 tasks. |
 | "I'll sort out conflicts after" | Designing for independence before dispatch is cheaper than resolving conflicts after. |
+| "Completions arrive automatically — I'll hand back" | Handing back ends the turn; nothing wakes it. Block on the wait primitive until the wave is done. |
