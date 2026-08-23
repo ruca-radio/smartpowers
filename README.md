@@ -66,6 +66,16 @@ The installer is idempotent: it runs `skill-lint` as a pre-flight, copies all sk
 | `saving-session-learnings` | End-of-session evaluation and knowledge persistence |
 | `using-cli-agent-harnesses` | Delegating to local CLI agents (Codex, OpenCode, Antigravity) |
 
+### Domain pack: paid advertising
+
+| Skill | When to Use |
+|-------|-------------|
+| `ads-audit` | Full multi-platform ad account audit (Google, Meta, LinkedIn, TikTok, Microsoft, Apple), parallel agents, 0-100 health scores |
+| `ads-attribution` | Attribution health audit — AdAttributionKit, GA4 models, Consent Mode V2, server-side stitching, MMP, cross-device |
+| `ads-budget` | Budget allocation and bidding strategy review — 70/20/10, 3x Kill Rule, 20% scaling rule, MER |
+| `ads-competitor` | Competitor ad intelligence — ad libraries, copy/creative/keyword analysis, gap identification |
+| `ads-create` | Campaign concept and copy brief generator — concepts, copy decks, image-generation briefs |
+
 Word counts per skill are verified by `skills/writing-skills/scripts/skill-lint` — run it before committing.
 
 After copying or cloning, make the helper scripts executable (git checkouts preserve the bit; archives may not):
