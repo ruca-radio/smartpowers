@@ -65,6 +65,7 @@ The installer is idempotent: it runs `skill-lint` as a pre-flight, copies all sk
 | `conducting-critical-review` | Adversarial review of agent-built code, with rework authority |
 | `saving-session-learnings` | End-of-session evaluation and knowledge persistence |
 | `using-cli-agent-harnesses` | Delegating to local CLI agents (Codex, OpenCode, Antigravity) |
+| `solving-ctf-challenges` | CTF and sanctioned security work — scope discipline, evidence hierarchy, per-discipline analysis |
 
 ### Domain pack: paid advertising
 
