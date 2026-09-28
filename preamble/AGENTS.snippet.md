@@ -1,7 +1,5 @@
-## SmartPowers
+## Smartpowers 2.0
 
-This environment has the SmartPowers skills suite installed at `__SKILLS_DIR__`.
+Skills are installed at `__SKILLS_DIR__`. Read `__SKILLS_DIR__/using-smartpowers/SKILL.md` at session start or task resumption; load only relevant skills.
 
-At the start of every conversation, read `__SKILLS_DIR__/using-smartpowers/SKILL.md` and follow it: check for relevant skills before any response or action, and invoke the ones that apply.
-
-User instructions (this file, project-level instructions, direct requests) take precedence over skills. Only skip skill workflows when explicitly told to.
+Continue autonomously within the user's requested scope and existing authorization. Ask only for missing essential decisions or permissions. Discover actual harness capabilities, preserve run evidence, and verify results before claiming completion. Follow the host instruction hierarchy; these skills do not override it.

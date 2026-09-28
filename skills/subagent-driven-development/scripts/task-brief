@@ -1,53 +1,14 @@
-#!/usr/bin/env bash
-# task-brief PLAN_FILE N — extract task N's section from a plan into
-# <repo>/.smartpowers/sdd/<plan-basename>/task-N-brief.md and print that path
-# as the last line of stdout.
-set -euo pipefail
+#!/usr/bin/env python3
+import argparse
+from _sdd import workspace, task_text
 
-usage() {
-  echo "usage: task-brief PLAN_FILE N" >&2
-  exit 1
-}
-
-[ $# -eq 2 ] || usage
-plan=$1
-n=$2
-[ -f "$plan" ] || { echo "task-brief: PLAN_FILE '$plan' is not an existing file" >&2; usage; }
-case $n in
-  ''|*[!0-9]*) echo "task-brief: N must be a non-negative integer" >&2; usage ;;
-esac
-
-if ! root=$(git rev-parse --show-toplevel 2>/dev/null); then
-  echo "task-brief: not inside a git repository" >&2
-  exit 2
-fi
-
-base=$(basename -- "$plan")
-base=${base%.*}
-outdir="$root/.smartpowers/sdd/$base"
-out="$outdir/task-$n-brief.md"
-
-brief=$(awk -v n="$n" '
-  {
-    if ($0 ~ /^```/) fence = !fence
-    if (!fence && found && $0 ~ /^##/) exit
-    if (!fence && $0 ~ /^### Task [0-9]+:/) {
-      rest = $0
-      sub(/^### Task /, "", rest)
-      num = rest + 0
-      found = (num == n)
-    }
-    if (found) print
-  }
-' "$plan")
-
-if [ -z "$brief" ]; then
-  echo "task-brief: no '### Task $n:' heading in $plan" >&2
-  available=$(grep -oE '^### Task [0-9]+' "$plan" | grep -oE '[0-9]+$' | sort -n | tr '\n' ' ' || true)
-  echo "task-brief: available task numbers: ${available:-none}" >&2
-  exit 1
-fi
-
-mkdir -p "$outdir"
-printf '%s\n' "$brief" > "$out"
-printf '%s\n' "$out"
+parser = argparse.ArgumentParser()
+parser.add_argument('plan')
+parser.add_argument('number', type=int)
+args = parser.parse_args()
+if args.number < 0:
+    parser.error('Task number cannot be negative')
+text = task_text(args.plan, args.number)
+out = workspace(args.plan) / f'task-{args.number}-brief.md'
+out.write_text(text)
+print(out)

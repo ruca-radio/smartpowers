@@ -1,95 +1,30 @@
 ---
 name: writing-plans
-description: Use when you have an approved spec or requirements for a multi-step task, before touching code.
+description: Use when authorized work has multiple tasks, dependencies, or interfaces requiring an execution plan.
 ---
 
 # Writing Plans
 
-Write implementation plans assuming the engineer has zero context, questionable taste, and an aversion to testing. Document everything: exact files, complete code, verification steps, test commands.
+Apply `smartpowers:core-principles`. Plan around deliverables and acceptance criteria, not arbitrary minute counts. Avoid writing the entire implementation twice.
 
-**Save to:** `docs/smartpowers/plans/YYYY-MM-DD-<feature-name>.md`
+Save a dated plan under docs/smartpowers/plans. Include goal, design/spec reference, global constraints, authorization scope, integration destination, and verification commands. State which providers may receive task context.
 
-## Plan Header
-
-```markdown
-# [Feature Name] Implementation Plan
-
-> **For agentic workers:** REQUIRED: Use `smartpowers:subagent-driven-development` or `smartpowers:executing-plans`.
-
-**Goal:** [One sentence]
-
-**Architecture:** [2-3 sentences]
-
-**Tech Stack:** [Key technologies]
-
-**Spec:** [path to design doc]
-```
-
-## Global Constraints
-
-Copy project-wide requirements verbatim: version floors, dependency limits, naming rules, platform requirements. Every task implicitly includes this section.
-
-## Task Structure
+Use this task shape:
 
 ```markdown
-### Task N: [Component Name]
-
-**Files:**
-- Create: `exact/path/to/file.py`
-- Modify: `exact/path/to/existing.py:123-145`
-- Test: `tests/exact/path/to/test.py`
-
-**Interfaces:**
-- Consumes: [exact signatures from earlier tasks]
-- Produces: [exact names/types for later tasks]
-
-- [ ] **Step 1: Write failing test**
-  ```python
-  def test_behavior():
-      result = function(input)
-      assert result == expected
-  ```
-  Run: `pytest tests/path/test.py::test_name -v`
-  Expected: FAIL with "function not defined"
-
-- [ ] **Step 2: Write minimal implementation**
-  ```python
-  def function(input):
-      return expected
-  ```
-
-- [ ] **Step 3: Verify test passes**
-  Run: `pytest tests/path/test.py::test_name -v`
-  Expected: PASS
-
-- [ ] **Step 4: Commit**
-  ```bash
-  git add tests/path/test.py src/path/file.py
-  git commit -m "feat: add specific feature"
-  ```
+### Task 1: Deliverable
+**Files:** exact affected paths
+**Dependencies:** task IDs and required interfaces
+**Inputs:** task-local context and relevant decisions
+**Output:** artifact paths and interface contract
+**Acceptance:** observable conditions for success
+**Verification:** exact commands or inspection criteria
+**Execution:** role and capability needs; workspace ownership
+**Retry:** safe to repeat, or side-effect reconciliation required
 ```
 
-## Rules
+Include concrete code when it resolves a fragile interface, not as mandatory boilerplate. Every task must carry the global constraints it needs. Reject placeholders that hide decisions essential to execution.
 
-- **Bite-sized:** Each task is one action, 2-5 minutes.
-- **No placeholders:** No "TBD", "TODO", "implement later", "add appropriate error handling", "similar to Task N". Every step contains the actual content needed.
-- **Self-contained:** An engineer reading one task in isolation has everything required.
-- **Task right-sizing:** Fold setup/config/docs into the task whose deliverable needs them. Split only where a reviewer could reject one task while approving its neighbor.
+Review coverage, dependency cycles, conflicting file ownership, resource limits, and mismatched interfaces before starting. Batch mechanical changes when they share one verification surface.
 
-## Self-Review
-
-After writing the plan:
-1. **Spec coverage:** Can you point to a task for every spec requirement? List gaps.
-2. **Placeholder scan:** Search for red-flag patterns. Fix them.
-3. **Type consistency:** Do signatures in later tasks match what earlier tasks define?
-
-Fix inline. No need to re-review — fix and move on.
-
-## Execution Handoff
-
-"Plan complete and saved to `<path>`. Two options:
-
-1. **Subagent-Driven (recommended)** — fresh subagent per task, review between tasks
-2. **Inline Execution** — batch execution with checkpoints
-
-Which approach?"
+Choose native agents, runtime workers, or inline execution based on available capabilities and coordination cost. Record the choice and begin authorized work; do not end with a redundant execution menu.

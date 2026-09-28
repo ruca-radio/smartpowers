@@ -1,20 +1,9 @@
-# Kimi / Moonshot Harness Notes
+# Kimi Harness Notes
 
-Orientation only — behavior varies by harness version. Check your harness documentation when something here doesn't match what you observe.
+Discover this installation's version, tool list, context limit, permissions, skill discovery path, model selection, messaging, and background wake-up support. These properties vary by release and surface; do not assume them from the harness name.
 
-## Skill Discovery
+Use native delegation when available. Otherwise use the Smartpowers command adapter for a headless CLI, the external worker protocol for an interactive harness, or inline execution. Read the installed CLI help before choosing flags. Do not assume sessions share history or workspaces; pass explicit artifact and interface references.
 
-- Install target: `~/.agents/skills/<skill-name>/SKILL.md` (the default of `install.sh --kimi`).
-- Discovery runs on frontmatter: `name` + `description`. Keep descriptions trigger-only per `smartpowers:writing-skills` — workflow summaries cause skipped loads.
+Install skills into the path this harness actually reads. With a custom target, specify --instructions explicitly to install the preamble; otherwise add it manually. The runtime is optional and separately installed.
 
-## Subagents
-
-- Kimi harnesses typically expose subagent dispatch (Task-style tools). If dispatch is unavailable in your configuration, fall back to `smartpowers:executing-plans` for inline plan execution with checkpoints.
-
-## Workspace Isolation
-
-- No native worktree tool is guaranteed — the git fallback in `smartpowers:using-git-worktrees` is the default path. The `.smartpowers/worktrees/` convention applies.
-
-## Context Budget
-
-- Moonshot models run long contexts, but the word budgets in `writing-skills` still bind: shorter skills load faster, cost less per session, and — per the framework's SDO findings — get read and followed more reliably than long ones.
+Checkpoint before handoff. Wait while workers run if this host cannot wake automatically. When resuming, inspect persisted attempts and reconcile uncertain effects before retrying.

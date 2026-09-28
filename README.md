@@ -1,108 +1,79 @@
-# SmartPowers
+# Smartpowers 2.0
 
-A lean, token-efficient agentic skills framework. Same rigor as Superpowers, half the context cost.
+Portable skills and an optional durable runtime for autonomous, multi-model agent workflows.
 
-## Philosophy
+Smartpowers separates **roles**, **models**, **providers**, and **harnesses**. Use the Markdown skills with your existing agent, or install the runtime to coordinate workers, dependencies, provider fallback, persistent messages, and restart recovery.
 
-- **Evidence over claims** — verify before declaring success
-- **Systematic over ad-hoc** — process prevents thrashing
-- **DRY applies to instructions** — say it once, reference it everywhere
-- **Calm precision beats shouting** — agents comply with clarity, not volume
+## What ships
 
-## How It Works
+- 27 portable skills covering design, implementation, review, debugging, collaboration, and paid advertising.
+- Scope-based autonomy: continue authorized work without repeated approval menus; supervised checkpoints remain available.
+- Python runtime with no third-party runtime dependencies, SQLite task leases, attempt fencing, event history, dependency scheduling, and exclusive resource ownership.
+- Command adapter for headless agents, external-worker protocol for other harnesses, and an OpenAI-compatible HTTP adapter for text tasks.
+- Capability/context filtering and configurable target priorities; bounded fallback only for retry-safe tasks.
+- Persistent reports and recipient-addressed mailboxes with explicit acknowledgements.
+- Recoverable skill installation and standalone plan/review helpers.
 
-1. **using-smartpowers** — loads at session start. Checks for relevant skills before any action.
-2. **brainstorming** — classifies work (spike / bounded / architectural), gets approval before implementation.
-3. **writing-plans** — breaks approved designs into 2-5 minute tasks with exact file paths and code.
-4. **subagent-driven-development** — dispatches fresh subagent per task, two-stage review, ledger-based recovery.
-5. **test-driven-development** — RED-GREEN-REFACTOR. No production code without a failing test first.
-6. **finishing-work** — verifies tests, presents merge/PR/keep options, cleans up.
+## Install skills
 
-## Installation
-
-One command, global install (Kimi Code is the default target):
+Requires Python 3.10+, Bash, and a Unix-like system for installer/helper locking.
 
 ```bash
-./install.sh              # Kimi / Moonshot harnesses -> ~/.agents/skills
-./install.sh --claude     # Claude Code -> ~/.claude/skills
-./install.sh --cursor     # Cursor -> ~/.cursor/skills
-./install.sh --target DIR # any other harness
-./install.sh --link       # dev mode: symlink instead of copy
-./install.sh --uninstall  # remove everything it installed
+bash install.sh                         # Existing Kimi profile
+bash install.sh --claude                # Existing Claude profile
+bash install.sh --cursor                # Skills; preamble is manual
+bash install.sh --target /path/to/skills --instructions /path/to/AGENTS.md
+bash install.sh --target /path/to/skills --link
+bash install.sh --target /path/to/skills --uninstall
 ```
 
-The installer is idempotent: it runs `skill-lint` as a pre-flight, copies all skills, makes helper scripts executable, installs a managed session-start preamble block into the harness's global instructions file (the portable equivalent of a session-start hook), and verifies every skill landed. Manual install still works: copy `skills/` into your harness's skills path, then `find skills -path '*/scripts/*' -type f -exec chmod +x {} +`.
+Confirm the skill discovery path for your installed harness version. A custom `--target` does **not** modify a default harness's global instructions. Specify `--instructions` to bind a preamble, or add `preamble/AGENTS.snippet.md` yourself. Repeated installs remember an explicit instruction-file binding.
 
-## Skills Library
+Upgrades preserve previous managed files under the target's `.smartpowers-backups/`. Unmanaged name collisions fail without overwriting the existing skill. The legacy line-based manifest is recognized. Uninstall preserves unrelated files and archives removed managed files.
 
-### Core workflow
-
-| Skill | When to Use |
-|-------|-------------|
-| `using-smartpowers` | Every session start |
-| `core-principles` | When any skill references shared philosophy |
-| `discipline-template` | When a skill needs to enforce a rule |
-| `brainstorming` | Before any creative work |
-| `writing-plans` | With an approved design, before code |
-| `test-driven-development` | Before writing implementation code |
-| `systematic-debugging` | When encountering any bug or failure |
-| `subagent-driven-development` | Executing plans with independent tasks |
-| `writing-skills` | Creating or editing skills |
-| `finishing-work` | When implementation is complete |
-
-### Supporting skills
-
-| Skill | When to Use |
-|-------|-------------|
-| `verification-before-completion` | Before declaring any task complete |
-| `using-git-worktrees` | Before feature work needing isolation |
-| `executing-plans` | Executing a written plan inline (no subagents) |
-| `requesting-code-review` | After tasks, before merges |
-| `receiving-code-review` | When responding to review feedback |
-| `dispatching-parallel-agents` | Multiple independent tasks, concurrently |
-| `sensitive-rd-protocol` | Confidential, NDA-covered, or non-public R&D work |
-| `orchestrating-agent-swarms` | Planning, sizing, and running multi-agent swarms |
-| `conducting-critical-review` | Adversarial review of agent-built code, with rework authority |
-| `saving-session-learnings` | End-of-session evaluation and knowledge persistence |
-| `using-cli-agent-harnesses` | Delegating to local CLI agents (Codex, OpenCode, Antigravity) |
-| `solving-ctf-challenges` | CTF and sanctioned security work — scope discipline, evidence hierarchy, per-discipline analysis |
-
-### Domain pack: paid advertising
-
-| Skill | When to Use |
-|-------|-------------|
-| `ads-audit` | Full multi-platform ad account audit (Google, Meta, LinkedIn, TikTok, Microsoft, Apple), parallel agents, 0-100 health scores |
-| `ads-attribution` | Attribution health audit — AdAttributionKit, GA4 models, Consent Mode V2, server-side stitching, MMP, cross-device |
-| `ads-budget` | Budget allocation and bidding strategy review — 70/20/10, 3x Kill Rule, 20% scaling rule, MER |
-| `ads-competitor` | Competitor ad intelligence — ad libraries, copy/creative/keyword analysis, gap identification |
-| `ads-create` | Campaign concept and copy brief generator — concepts, copy decks, image-generation briefs |
-
-Word counts per skill are verified by `skills/writing-skills/scripts/skill-lint` — run it before committing.
-
-After copying or cloning, make the helper scripts executable (git checkouts preserve the bit; archives may not):
+## Install the optional runtime
 
 ```bash
-find skills -path '*/scripts/*' -type f -exec chmod +x {} +
+python3 -m pip install .
+smartpowers --version
+smartpowers validate examples/local-workflow.json
+smartpowers start examples/local-workflow.json
 ```
 
-## What Changed vs. Superpowers
+Alternatively, run `python3 -m smartpowers` from this checkout. Run the example from the repository root; it uses a deterministic local worker and makes no provider calls. `start` prints the run ID before execution. Workflows and CLI responses use protocol version **1**; the package release is **2.0.0**.
 
-| Issue in Superpowers | SmartPowers Fix |
-|---------------------|-----------------|
-| Token bloat (~9,500 words loaded) | Shared patterns extracted into `core-principles` and `discipline-template` |
-| Repeated "Iron Law" / "No exceptions" / Red Flags boilerplate | Compressed — shared enforcement pattern lives in `discipline-template`; skills keep only rule-specific rationalizations |
-| ALL-CAPS brute-force compliance | Calm, precise language + rationalization tables (which actually work) |
-| Graphviz flowcharts | Text-based state diagrams and tables (readable, token-efficient) |
-| `<SUBAGENT-STOP>` hack | Removed — belongs in harness bootstrap, not skill content |
-| Description fields summarizing workflow | All descriptions are trigger-only, per SDO research |
-| No shared philosophy skill | Added `core-principles` — said once, referenced everywhere |
-| Platform fragmentation | Harness-agnostic skills; platform notes in `using-smartpowers` only |
-| No enforcement of token targets | `skill-lint` automates the checks |
+```bash
+smartpowers status RUN_ID
+smartpowers resume RUN_ID --workers 4
+smartpowers events RUN_ID
+smartpowers export RUN_ID
+```
 
-## Contributing
+The default database is `.smartpowers/state.db`. Use `--db PATH` **before** the command to share state across harnesses. Results live beside it under `artifacts/`. Keep both; Git does not back up ignored runtime state.
 
-Follow `writing-skills`. Every skill is test-driven: baseline scenario without the skill, then with. Run `skills/writing-skills/scripts/skill-lint` before committing.
+## Execution targets
 
-## License
+| Adapter | Integration | Evidence level |
+|---|---|---|
+| `command` | Headless executable; versioned JSON or prompt/text stdin/stdout | Tested with real local subprocesses |
+| `external` | Any harness able to run the claim/heartbeat/complete CLI or Python API | Tested across separate controller/worker processes |
+| `openai-compatible` | Configured chat-completions URL and environment-based credentials | Tested against a local HTTP fixture; no live provider certification |
+
+A command worker can use its harness's tools. The direct HTTP adapter is text-only and does not implement a tool-calling loop. Native Codex, Claude, Kimi, OpenCode, Pi, and other agents can use the skills or external-worker protocol; there are no hard-coded vendor CLI flags. Configure and verify your installed CLI's headless/model flags before using the command adapter.
+
+## Autonomy and capabilities
+
+The skills default to proceeding within the user's requested scope. The runtime requires an explicit provider and capability grant in each workflow. `autonomous` executes eligible tasks; `supervised` requires task approval. These grants select workers; they are **not an operating-system sandbox**. Configure the actual harness/tool permissions separately.
+
+Capability names are extensible strings. There is no vendor whitelist or fixed tool catalog. An adapter cannot grant unavailable tools, credentials, or model features. Use an authorized alternate target or surface a concrete blocked state.
+
+## Verification
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 skills/writing-skills/scripts/skill-lint skills
+```
+
+See [runtime contracts and operations](docs/runtime.md), [migration and limitations](docs/migration-v2.md), and [release notes](CHANGELOG.md). The paid-advertising domain pack is retained from v1; its domain claims are not revalidated by the v2 runtime tests.
 
 MIT — see [LICENSE](LICENSE).

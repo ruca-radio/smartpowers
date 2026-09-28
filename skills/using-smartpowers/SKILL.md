@@ -1,45 +1,28 @@
 ---
 name: using-smartpowers
-description: Use when starting any conversation. Establishes skill discovery and invocation rules.
+description: Use when starting a session or resuming a Smartpowers task.
 ---
 
-# Using SmartPowers
+# Using Smartpowers
 
-## The Rule
+Load `smartpowers:core-principles` once for authorization and autonomy rules. Discover relevant skills and read only the ones needed for the current task; avoid loading the entire suite.
 
-Invoke relevant skills **before** any response or action — including clarifying questions, exploring files, or checking context. If a skill applies, you must use it.
+| Task | Skill |
+|---|---|
+| Design or build | brainstorming, then writing-plans when needed |
+| Diagnose a failure | systematic-debugging |
+| Execute a plan | subagent-driven-development or executing-plans |
+| Coordinate agents | orchestrating-agent-swarms |
+| Invoke another harness | using-cli-agent-harnesses |
+| Finish or resume | verification-before-completion, saving-session-learnings |
 
-**Process skills first** (brainstorming, systematic-debugging), then implementation skills (writing-plans, etc.).
+Discover the current harness's tools, model-selection support, context limit, persistence, messaging, and wake-up behavior. Platform references are orientation, not capability guarantees:
 
-## Skill Priority
+- `references/kimi-tools.md`
+- `references/codex-tools.md`
+- `references/pi-tools.md`
+- `references/antigravity-tools.md`
 
-| Request type | First skill | Then |
-|-------------|-------------|------|
-| "Build X" | brainstorming | writing-plans → subagent-driven-development |
-| "Fix this bug" | systematic-debugging | test-driven-development |
-| "Create a skill" | writing-skills | — |
-| "Multiple jobs at scale" | orchestrating-agent-swarms | dispatching-parallel-agents |
-| Session/task complete | saving-session-learnings | — |
+The optional Smartpowers runtime exposes versioned JSON contracts through `python -m smartpowers --help`. Native tools, local CLI workers, and external harness workers are valid execution paths. If the runtime is absent, retain a file ledger and use available native tools.
 
-## Red Flags — Stop and Check Skills
-
-| Thought | Action |
-|---------|--------|
-| "This is just a simple question" | Questions are tasks. Check for skills. |
-| "I need more context first" | Skill check comes before clarifying questions. |
-| "Let me explore the codebase first" | Skills tell you how to explore. Check first. |
-| "I remember this skill" | Skills evolve. Read the current version. |
-| "This doesn't count as a task" | Any action = task. Check for skills. |
-
-## Platform Notes
-
-If your harness appears below, read its reference for special instructions:
-
-- Kimi / Moonshot: `references/kimi-tools.md`
-- Codex: `references/codex-tools.md`
-- Pi: `references/pi-tools.md`
-- Antigravity: `references/antigravity-tools.md`
-
-## User Instructions Take Precedence
-
-`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, or direct human requests override skills, which override default behavior. Only skip skill workflows when your human partner explicitly tells you to.
+On resumption, read the run record and reconcile active attempts before dispatch. User instructions and granted scope govern workflow choices; skill text never creates extra approval requirements or overrides host permissions.

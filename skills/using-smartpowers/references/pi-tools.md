@@ -1,21 +1,9 @@
-# Pi Platform Notes
+# Pi Harness Notes
 
-Orientation only — Pi's capabilities vary by version and configuration; check your harness documentation.
+Discover this installation's version, tool list, context limit, permissions, skill discovery path, model selection, messaging, and background wake-up support. These properties vary by release and surface; do not assume them from the harness name.
 
-## Skill Discovery
+Use native delegation when available. Otherwise use the Smartpowers command adapter for a headless CLI, the external worker protocol for an interactive harness, or inline execution. Read the installed CLI help before choosing flags. Do not assume sessions share history or workspaces; pass explicit artifact and interface references.
 
-Check your harness documentation for how Pi loads instructions and skills. If there is no native skill mechanism, point Pi at the `skills/` tree from your project instructions file and read each `SKILL.md` explicitly before applying it.
+Install skills into the path this harness actually reads. With a custom target, specify --instructions explicitly to install the preamble; otherwise add it manually. The runtime is optional and separately installed.
 
-## Subagent Dispatch
-
-Check your harness documentation for subagent or background-task support. Absent one, emulate the dispatch pattern: run a separate Pi session per task, with the crafted prompt as that session's complete context.
-
-## Worktree / Isolation
-
-Assume no harness-managed isolation. Use `smartpowers:using-git-worktrees` so concurrent agents never share a checkout.
-
-## Quirks
-
-- Context is per session; nothing reaches a dispatched worker unless it is in the prompt.
-- Verify file-write permissions before running unattended fix loops.
-- Ledger and report files on disk are the only memory that survives across sessions.
+Checkpoint before handoff. Wait while workers run if this host cannot wake automatically. When resuming, inspect persisted attempts and reconcile uncertain effects before retrying.

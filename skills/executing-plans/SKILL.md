@@ -1,55 +1,16 @@
 ---
 name: executing-plans
-description: Use when you have a written implementation plan to execute in a separate session with review checkpoints.
+description: Use when executing a plan inline or when delegation would not improve the work.
 ---
 
 # Executing Plans
 
-## Overview
+Apply `smartpowers:core-principles`. Read the plan, inspect the current state, and identify the first incomplete task. Verify completed work before relying on it.
 
-Load plan, review critically, execute all tasks, report when complete.
+Resolve routine gaps and record the decision. Ask only for missing essential information or authority. Choose inline execution when tasks share tight context or delegation costs exceed the benefit.
 
-**Announce:** "I'm using the executing-plans skill to implement this plan."
+For each task, record in-progress status, implement the deliverable, run the acceptance checks, and persist the result. Diagnose ordinary test failures and missing dependencies within scope; they are repair work, not automatic reasons to stop.
 
-**Note:** If subagents are available, use `smartpowers:subagent-driven-development` instead.
+On repeated failure, change the approach using evidence. Respect the attempt budget. If blocked, state the exact dependency or decision needed and preserve a resumable record.
 
-## Process
-
-### Step 1: Load and Review
-1. Ensure isolated workspace via `smartpowers:using-git-worktrees`
-2. Read plan file
-3. Review critically — identify questions or concerns
-4. If concerns: raise with human partner before starting
-5. If no concerns: create todos and proceed
-
-### Step 2: Execute Tasks
-
-For each task:
-1. Mark in_progress
-2. Follow each step exactly
-3. Run verifications as specified
-4. Mark completed
-
-### Step 3: Complete
-
-After all tasks:
-- Announce: "I'm using `smartpowers:finishing-work` to complete this work."
-- Follow that skill to verify tests, present options, execute choice
-
-## Stop Conditions
-
-Stop immediately when:
-- Blocker (missing dependency, test fails, unclear instruction)
-- Plan has critical gaps
-- You don't understand an instruction
-- Verification fails repeatedly
-
-Ask for clarification. Don't guess.
-
-## Revisit Earlier Steps
-
-Return to review when:
-- Partner updates plan based on your feedback
-- Fundamental approach needs rethinking
-
-Don't force through blockers.
+When all acceptance criteria pass, use `smartpowers:finishing-work`. Continue through the already-authorized integration destination without asking the same question again.

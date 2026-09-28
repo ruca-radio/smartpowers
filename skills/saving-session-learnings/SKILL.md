@@ -5,7 +5,7 @@ description: Use when a work session or major task completes — evaluate perfor
 
 # Saving Session Learnings
 
-Close every session by banking what it taught you. Unsaved learnings get relearned at full cost.
+Preserve run evidence and bank useful findings. Follow `smartpowers:core-principles` for authorization.
 
 ## When
 
@@ -42,12 +42,13 @@ Format for future-you: context line, the knowledge, the evidence. No narrative r
 
 ## Step 4: Feed the Loop
 
-If a learning indicts a skill — a rule was unclear, a check was missing — record the proposed edit in the learnings file and apply it via `smartpowers:writing-skills` next session. Learnings that never change the system are trivia.
+If a learning indicts a skill — a rule was unclear, a check was missing — record the proposed edit in the learnings file and apply it via `smartpowers:writing-skills` when authorized in the current scope; otherwise preserve it as a follow-up. Learnings that never change the system are trivia.
 
 ## Rationalization Table
 
 | Excuse | Reality |
 |--------|---------|
-| "Nothing new happened this session" | Then write one line saying so. The ritual staying cheap is what keeps it alive. |
+| "Nothing new happened this session" | Skip a separate learning artifact when there is no durable learning; retain the run evidence. |
 | "I'll remember it" | You won't — context resets. The file remembers. |
 | "Too busy wrapping up" | Five minutes now beats re-deriving it under pressure later. |
+

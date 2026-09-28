@@ -1,66 +1,41 @@
 ---
 name: orchestrating-agent-swarms
-description: Use when planning work that needs multiple AI agents — designing agent roles, sizing the swarm to the task, and running agents in parallel or stages.
+description: Use when work benefits from multiple agents, models, providers, or collaboration patterns.
 ---
 
 # Orchestrating Agent Swarms
 
-Plan, staff, and run a swarm of task-specific agents. Scale the swarm to the work — no bigger.
+Apply `smartpowers:core-principles`. Define the work graph before staffing. Separate role, model, provider, and harness so any compatible target can fill a role.
 
-**Related:** `smartpowers:dispatching-parallel-agents` (dispatch mechanics) and `smartpowers:subagent-driven-development` (plan execution with per-task review). This skill decides the swarm's shape; those skills run it.
+## Choose a topology
 
-## Stage 1: Decompose
+| Work | Pattern |
+|---|---|
+| Independent deliverables | Parallel workers |
+| Outputs consumed by later tasks | Dependency graph or pipeline |
+| Ambiguous interface | Peer discussion, then record the agreed contract |
+| Independent assessment | Implementer and reviewer |
+| Large separable project | Hierarchical delegation within shared budgets |
+| Ongoing work | Persistent workers only when wake-up and state storage exist |
 
-Break the job into atomic tasks. A task is atomic when one agent can hold it in context and finish it without another agent's in-flight output.
+Do small tasks directly. Size concurrency by work, provider quotas, available memory, and review capacity. A role brief defines mission, inputs, capabilities, outputs, acceptance criteria, resource ownership, and authorization.
 
-- Tasks independent → parallel wave.
-- Task N needs task N-1's output → pipeline stage. Never parallelize across a dependency.
-- Map dependencies on paper before staffing. A swarm run from an unmapped dependency graph fails mid-flight.
+## Capability discovery and routing
 
-## Stage 2: Design Roles
+Discover native delegation, per-agent model selection, messaging, context limits, filesystem sharing, background support, and tool access. Use CLI or external worker adapters when native features are absent. Never simulate unavailable tools by claiming they ran.
 
-One role per distinct capability, not per task. Agents of the same role are interchangeable instances.
+Choose targets meeting capability and context requirements, then rank by task success, latency, cost, and availability. Preserve the authorized provider/data scope during fallback. The runtime implements explicit priorities and capability/context matching; empirical ranking requires caller-supplied priorities.
 
-Each role brief defines: mission (one sentence), inputs, output contract (exact format and file path), constraints, and what it must NOT do. No role receives your session history — craft exactly what it needs, nothing else.
+## Coordinate
 
-## Stage 3: Size the Swarm
+Give tasks stable identities and attempts unique identities. Use durable artifacts rather than copying full histories. Peer messages need sender, recipient, correlation ID, and acknowledgement; route through the controller only when direct messaging is unavailable.
 
-Scale by work, not enthusiasm:
+Use transactional claims or leases for shared resources. Parallel writers need isolated workspaces or explicit ownership. Verify producer artifacts before dependent tasks start. Review and integrate outputs continuously.
 
-| Workload | Swarm |
-|----------|-------|
-| 1-2 tasks | Do it yourself — dispatch overhead exceeds the gain |
-| 3-8 independent tasks | One agent per task, single wave |
-| 9+ tasks or staged work | Waves: stage gates between dependency layers, parallel within a stage |
-| Continuous pipeline | Long-lived background agents, woken by message as work arrives |
+Persist decisions and status before handoff. If the harness lacks automatic wake-up, remain active and wait in bounded intervals. Detached work requires a real supervisor, not a promise that agents will report later.
 
-**Cap: never run more parallel agents than you can review.** Unreviewed parallel output is unmerged risk compounding silently. Stay within your harness's live-agent limit.
+## Recover
 
-Model per role: the least capable model that handles the task class (see the model table in `smartpowers:subagent-driven-development`).
+Distinguish authentication/quota, transient transport, task ambiguity, unavailable capability, and invalid output. Use authorized provider fallback where appropriate. Expired work may have produced side effects; replay only if retry-safe or reconciled. Fence old attempts so late results cannot overwrite current state.
 
-## Stage 4: Run
-
-- Dispatch a full wave simultaneously; record agent identities.
-- **Stage gates:** validate a stage's merged outputs before dispatching the next stage. Parallel agents cannot see each other — route all shared context yourself.
-- While agents run, do your own non-overlapping work (ledger, next briefs, review packaging). Never idle-poll.
-- **Turn discipline:** never end the turn with agents in flight — an ended turn does not resume in most harnesses. Block on the harness wait primitive in bounded stretches until the wave completes. Status notes go between waits, never instead of them.
-- Merge per `smartpowers:dispatching-parallel-agents`; run integrated verification on the merged result.
-
-## Failure Handling
-
-| Scenario | Action |
-|----------|--------|
-| One agent fails | Retry with more context or a narrower task |
-| A whole wave fails | Decomposition error — stop, re-map dependencies, redesign |
-| Agent stalls | Bounded wait, one status check, then cancel and re-dispatch |
-| Same role fails repeatedly | The role design is wrong — rewrite the brief, don't just re-dispatch |
-
-## Rationalization Table
-
-| Excuse | Reality |
-|--------|---------|
-| "More agents = faster" | Coordination and review costs scale superlinearly. Unreviewed output is not progress. |
-| "They'll figure out the shared context" | Parallel agents see nothing of each other. Route it or it doesn't exist. |
-| "This dependency is minor" | A minor dependency is still a dependency. Stage it. |
-| "I'll review everything at the end" | End-of-swarm review finds structural problems after N agents have amplified them. Gate each stage. |
-| "Completions arrive automatically" | In most harnesses an ended turn never resumes. Block on the wait primitive; don't hand back. |
+Use `smartpowers:dispatching-parallel-agents` for execution mechanics and `smartpowers:subagent-driven-development` for implementation review.

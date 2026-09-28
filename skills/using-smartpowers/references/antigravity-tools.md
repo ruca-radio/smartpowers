@@ -1,21 +1,9 @@
-# Antigravity Platform Notes
+# Antigravity Harness Notes
 
-Orientation only — Antigravity evolves quickly; check your harness documentation.
+Discover this installation's version, tool list, context limit, permissions, skill discovery path, model selection, messaging, and background wake-up support. These properties vary by release and surface; do not assume them from the harness name.
 
-## Skill Discovery
+Use native delegation when available. Otherwise use the Smartpowers command adapter for a headless CLI, the external worker protocol for an interactive harness, or inline execution. Read the installed CLI help before choosing flags. Do not assume sessions share history or workspaces; pass explicit artifact and interface references.
 
-Antigravity supports agent-defined instructions and skills. Check your harness documentation for the current install location (workspace- or user-level skills/rules directories); place the `skills/` tree there or index it from the workspace rules file.
+Install skills into the path this harness actually reads. With a custom target, specify --instructions explicitly to install the preamble; otherwise add it manually. The runtime is optional and separately installed.
 
-## Subagent Dispatch
-
-Antigravity runs agents as managed tasks, including background and parallel work. Map "dispatch a subagent" to a fresh managed task with the crafted prompt as its complete instructions. Check your harness documentation for task isolation guarantees.
-
-## Worktree / Isolation
-
-Check whether your version gives each managed task its own workspace. If tasks share a checkout, use `smartpowers:using-git-worktrees` before running parallel or fix-loop work.
-
-## Quirks
-
-- Agents produce artifacts (plans, walkthroughs) per task — treat ledger and report files as the durable record instead.
-- Browser/editor integrations are out of scope for skill prompts; keep dispatches text-only.
-- Review artifacts for scope expansion before approving task completion.
+Checkpoint before handoff. Wait while workers run if this host cannot wake automatically. When resuming, inspect persisted attempts and reconcile uncertain effects before retrying.

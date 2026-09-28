@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "root": ".",
+  "authorization": {"mode": "autonomous", "providers": ["local"], "capabilities": ["text"]},
+  "targets": [{"id": "local-worker", "adapter": "command", "provider": "local", "model": "deterministic-fixture", "capabilities": ["text"], "command": ["python3", "examples/local_worker.py"]}],
+  "tasks": [
+    {"id": "research", "role": "researcher", "prompt": "Produce the input artifact.", "requires": ["text"], "retry_safe": true},
+    {"id": "review", "role": "reviewer", "prompt": "Review the input artifact.", "requires": ["text"], "depends_on": ["research"], "retry_safe": true}
+  ]
+}

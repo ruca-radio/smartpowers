@@ -1,44 +1,9 @@
-#!/usr/bin/env bash
-# sdd-workspace PLAN_FILE — create (or return) the git-ignored SDD workspace
-# for a plan and print its absolute path as the last line of stdout.
-set -euo pipefail
+#!/usr/bin/env python3
+import argparse
+from _sdd import workspace
 
-usage() {
-  echo "usage: sdd-workspace PLAN_FILE" >&2
-  exit 1
-}
-
-[ $# -eq 1 ] || usage
-plan=$1
-[ -f "$plan" ] || { echo "sdd-workspace: PLAN_FILE '$plan' is not an existing file" >&2; usage; }
-
-if ! root=$(git rev-parse --show-toplevel 2>/dev/null); then
-  echo "sdd-workspace: not inside a git repository" >&2
-  exit 2
-fi
-
-base=$(basename -- "$plan")
-base=${base%.*}
-workspace="$root/.smartpowers/sdd/$base"
-
-# Ensure .smartpowers/ is git-ignored.
-if ! git -C "$root" check-ignore -q .smartpowers/sdd; then
-  gitignore="$root/.gitignore"
-  touch "$gitignore"
-  # Avoid duplicate entry if .gitignore already lists it but gitignore rules
-  # still do not cover the path (e.g. a later negation).
-  if ! grep -qxF '.smartpowers/' "$gitignore"; then
-    printf '.smartpowers/\n' >> "$gitignore"
-  fi
-  if [ -n "$(git -C "$root" rev-parse --verify --quiet HEAD 2>/dev/null || true)" ] \
-     && git -C "$root" config user.name >/dev/null 2>&1 \
-     && git -C "$root" config user.email >/dev/null 2>&1; then
-    git -C "$root" add .gitignore
-    git -C "$root" commit -m "chore: ignore .smartpowers workspace" >/dev/null
-  else
-    echo "sdd-workspace: warning: appended '.smartpowers/' to .gitignore but did not commit (no prior commit or git identity not configured)" >&2
-  fi
-fi
-
-mkdir -p "$workspace"
-printf '%s\n' "$workspace"
+parser = argparse.ArgumentParser(description='Create or resume a persistent SDD workspace without changing the Git index')
+parser.add_argument('plan')
+parser.add_argument('--new', action='store_true')
+args = parser.parse_args()
+print(workspace(args.plan, args.new))

@@ -60,7 +60,7 @@ Complete each phase before the next.
 3. **Verify fix** — test passes? No other tests broken? Issue actually resolved? Use `smartpowers:verification-before-completion`.
 4. **If fix doesn't work:** STOP. Count attempts.
    - < 3: Return to Phase 1 with new information.
-   - **≥ 3: STOP and question the architecture.** Each fix revealing new shared state/coupling indicates a structural problem. Discuss with your human partner before Fix #4.
+   - **≥ 3: STOP and question the architecture.** Each fix revealing new shared state/coupling indicates a structural problem. Revise the hypothesis and decomposition before another attempt; involve the user only for a missing essential decision or authority.
 
 ## Red Flags — Stop and Follow Process
 
@@ -94,3 +94,4 @@ Complete each phase before the next.
 | 2. Pattern | Find working examples, compare | Identify differences |
 | 3. Hypothesis | Form theory, test minimally | Confirmed or new hypothesis |
 | 4. Implementation | Create test, fix, verify | Bug resolved, tests pass |
+

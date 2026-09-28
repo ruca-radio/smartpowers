@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smartpowers"
+version = "2.0.0"
+description = "Portable agent workflows with durable multi-provider coordination"
+requires-python = ">=3.10"
+dependencies = []
+license = {text = "MIT"}
+
+[project.scripts]
+smartpowers = "smartpowers.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["smartpowers*"]

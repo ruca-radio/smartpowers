@@ -1,41 +1,20 @@
 ---
 name: discipline-template
-description: Use when writing a skill that enforces a rule agents skip under pressure. The shared enforcement pattern.
+description: Use when writing a reusable rule that needs clear conditions, evidence, and recovery behavior.
 ---
 
-# Discipline Enforcement Pattern
+# Discipline Template
 
-Use this structure when a skill must enforce a rule agents tend to skip under pressure.
+Apply `smartpowers:core-principles`. Define rules in terms of observable conditions and useful outcomes.
 
-## 1. State the Rule Clearly
+For each rule, state:
 
-```
-NO [ACTION] WITHOUT [PREREQUISITE] FIRST
-```
+- Trigger: when the rule applies.
+- Action: the required behavior.
+- Evidence: how compliance is established.
+- Recovery: what to do when the condition cannot be satisfied.
+- Authority: which user or host instruction controls the decision.
 
-## 2. Close Loopholes Explicitly
+Use concrete failure examples when they improve understanding. Avoid blanket prohibitions that create unnecessary approvals, destroy valid work, or assume capabilities every harness does not share.
 
-- Don't keep it as "reference"
-- Don't "adapt" it while doing it right
-- Don't look at it
-- Delete means delete
-
-## 3. Rationalization Table
-
-Capture exact excuses from baseline testing:
-
-| Excuse | Reality |
-|--------|---------|
-| "Too simple to need this" | Simple things break. The check takes 30 seconds. |
-| "I'll do it after" | After proves nothing. You never watched the failure. |
-| "This is different because..." | It isn't. Follow the rule. |
-
-## 4. Red Flags — Stop and Restart
-
-- [Action] before [prerequisite]
-- "I already manually checked it"
-- "[Prerequisite] after achieves the same purpose"
-- "It's about spirit not ritual"
-- "Keep as reference" or "adapt existing"
-
-**All of these mean: Delete work. Start over with the rule.**
+When a rule is violated, identify the resulting uncertainty, preserve useful work, and perform the smallest verification or repair needed. Do not substitute repetition or ritual for evidence.

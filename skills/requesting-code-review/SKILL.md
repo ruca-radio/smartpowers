@@ -16,7 +16,7 @@ Dispatch a code reviewer subagent to catch issues before they cascade. Give prec
 **Mandatory:**
 - After each task in subagent-driven development
 - After completing major feature
-- Before merge to main
+- Before integration into the actual base branch
 
 **Optional but valuable:**
 - When stuck (fresh perspective)
@@ -27,7 +27,7 @@ Dispatch a code reviewer subagent to catch issues before they cascade. Give prec
 
 1. **Get git SHAs:**
    ```bash
-   BASE_SHA=$(git rev-parse HEAD~1)  # or origin/main
+   BASE_SHA=<commit-captured-before-task-start>
    HEAD_SHA=$(git rev-parse HEAD)
    ```
 
@@ -56,3 +56,4 @@ Dispatch a code reviewer subagent to catch issues before they cascade. Give prec
 - Ignore Critical issues
 - Proceed with unfixed Important issues
 - Argue with valid technical feedback
+

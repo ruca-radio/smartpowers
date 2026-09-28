@@ -1,111 +1,28 @@
 ---
 name: finishing-work
-description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work.
+description: Use when work is ready for final verification, integration, and handoff.
 ---
 
 # Finishing Work
 
-## Overview
+Apply `smartpowers:core-principles`. Determine the requested integration destination from the task, plan, and existing authorization.
 
-Verify tests → detect environment → present options → execute choice → clean up.
+Verify the final artifact or tree with the relevant checks. Investigate failures within scope; do not claim completion while acceptance criteria fail. Report unrelated baseline failures separately with evidence.
 
-## Step 1: Verify Tests
+| Authorized destination | Action |
+|---|---|
+| Review only | Deliver findings; do not change the project |
+| Implementation with branch/PR delivery | Commit scoped changes, push the branch, open/update the PR |
+| Explicit merge or deployment | Complete the requested integration and verify the result |
+| Local-only | Retain changes and report their location |
+| Destination materially unclear | Prepare verified changes, then ask one focused question |
 
-Run full test suite. If failures, report and stop — menu comes after green.
+Never require an integration menu when the destination is already established. Do not infer main-branch merge or production deployment from a generic request to implement.
 
-## Step 2: Detect Environment
+Capture the actual base branch from Git metadata or project configuration. Do not assume it is named main. Check for unrelated changes before staging; stage only the task's files.
 
-```bash
-GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
-GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
-WORKTREE_PATH=$(git rev-parse --show-toplevel)
-```
+Preserve the run record, attempts, review findings, reports, and verification evidence. Archive run data before deleting disposable workspaces. Keep PR worktrees available for feedback. Host-owned workspaces stay with the host.
 
-| State | Menu | Cleanup |
-|-------|------|---------|
-| `GIT_DIR == GIT_COMMON` | Standard 3 options | None |
-| `GIT_DIR != GIT_COMMON`, named branch | Standard 3 options | Provenance-based |
-| `GIT_DIR != GIT_COMMON`, detached HEAD | Reduced 2 options (no merge) | Leave in place |
+Remove only worktrees created for this task after their contents are preserved and no active agent owns them. If uncommitted work remains, preserve it and resolve ownership; do not force deletion.
 
-## Step 3: Determine Base Branch
-
-Usually named in plan or conversation. If unknown, ask: "This branch split from `<guess>` — correct?"
-
-## Step 4: Present Options
-
-**Normal repo / named branch:**
-```
-Implementation complete. What would you like to do?
-
-1. Merge back to <base-branch> locally
-2. Push and create a Pull Request
-3. Keep the branch as-is (I'll handle it later)
-```
-
-**Detached HEAD:**
-```
-Implementation complete. Detached HEAD workspace.
-
-1. Push as new branch and create a Pull Request
-2. Keep as-is (I'll handle it later)
-```
-
-Wait for answer. Discard only on explicit request.
-
-## Step 5: Execute Choice
-
-**Merge locally:**
-```bash
-MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
-cd "$MAIN_ROOT"
-git checkout <base-branch>
-git pull
-git merge <feature-branch>
-# Verify tests on merged result
-```
-
-If merged result fails: stop, leave worktree/branch, investigate.
-
-If green: clean up worktree, delete branch: `git branch -d <feature-branch>`
-
-**Push and PR:**
-```bash
-git push -u origin <feature-branch>
-# Create PR against <base-branch>
-```
-
-Keep worktree for PR feedback.
-
-**Keep as-is:** Report branch name and worktree path.
-
-**Discard (explicit request only):**
-Confirm: "Type 'discard' to permanently delete branch `<name>`, all commits, and worktree."
-Wait for exact confirmation. Then clean up worktree and `git branch -D <feature-branch>`.
-
-## Step 6: Cleanup
-
-**If `GIT_DIR == GIT_COMMON`:** Normal repo, nothing to clean.
-
-**If `WORKTREE_PATH` under `.smartpowers/worktrees/`:** We own cleanup:
-```bash
-git worktree remove "$WORKTREE_PATH"
-git worktree prune
-```
-
-**If removal refused** (uncommitted files): show `git status`, ask:
-1. Commit them
-2. Move to main repo
-3. Delete them
-
-Never `--force` on your own initiative.
-
-**Otherwise:** Host environment owns workspace — leave in place.
-
-## Rationalization Table
-
-| Excuse | Reality |
-|--------|---------|
-| "Tests passed earlier this session" | Run on the tree you're about to integrate. Green proves the tree it ran on. |
-| "They obviously want it merged" | Integration is their decision. Present menu and wait. |
-| "The PR is up, worktree is clutter" | PR feedback gets fixed there. It stays until work lands. |
-| "Removal refused — `--force` is just cleanup" | Refusal means files exist only there. `--force` destroys them permanently. |
+Report what changed, verification results, the branch/PR or artifact, and any unresolved limitations. Use `smartpowers:saving-session-learnings` for reusable findings.

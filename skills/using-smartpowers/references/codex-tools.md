@@ -1,20 +1,9 @@
-# Codex Platform Notes
+# Codex Harness Notes
 
-Orientation only — behavior varies by version and surface; check your harness documentation.
+Discover this installation's version, tool list, context limit, permissions, skill discovery path, model selection, messaging, and background wake-up support. These properties vary by release and surface; do not assume them from the harness name.
 
-## Skill Discovery
+Use native delegation when available. Otherwise use the Smartpowers command adapter for a headless CLI, the external worker protocol for an interactive harness, or inline execution. Read the installed CLI help before choosing flags. Do not assume sessions share history or workspaces; pass explicit artifact and interface references.
 
-Codex reads repo-level instructions from `AGENTS.md`. Skills are not necessarily auto-discovered; list the `skills/` tree (or the specific `SKILL.md` paths) in `AGENTS.md` and read each skill explicitly before applying it.
+Install skills into the path this harness actually reads. With a custom target, specify --instructions explicitly to install the preamble; otherwise add it manually. The runtime is optional and separately installed.
 
-## Subagent Dispatch
-
-Delegation mechanics differ between the CLI and cloud surfaces. If no explicit subagent tool exists, emulate the dispatch pattern: start a fresh session per task with the crafted prompt as its complete context. Check your harness documentation for current subagent support.
-
-## Worktree / Isolation
-
-CLI: use `smartpowers:using-git-worktrees` directly. Cloud: each task already runs in an isolated environment; worktrees matter only when agents share a checkout.
-
-## Quirks
-
-- Sandbox and approval settings can block writes outside the workspace — configure before subagent-driven development.
-- Sessions share no history; every dispatch prompt must be fully self-contained.
+Checkpoint before handoff. Wait while workers run if this host cannot wake automatically. When resuming, inspect persisted attempts and reconcile uncertain effects before retrying.
